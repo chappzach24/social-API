@@ -1,0 +1,1 @@
+// add thought, get all thoughts, get single thought, update thought, delete thought, add reaction, delete reaction
