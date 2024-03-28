@@ -59,8 +59,6 @@ module.exports = {
   },
   async addFriend(req, res) {
     const { userId, friendId } = req.params;
-    // find user and friendID
-    // find the user by their id then update the users friends array and push the friendId into that array
 
     try {
       const user = await User.findByIdAndUpdate(
@@ -75,4 +73,21 @@ module.exports = {
       res.status(500).json({ message: "Server Error" });
     }
   },
+
+  async deleteFriend(req, res) {
+    const { userId, friendId } = req.params;
+
+    try {
+      const user = await User.findByIdAndUpdate(
+        userId,
+        { $pull: { friends: friendId } },
+        { new: true }
+      );
+
+      res.json(user);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Server Error" });
+    }
+  }
 };
