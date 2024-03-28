@@ -4,19 +4,21 @@ const {
   getThoughts,
   getThoughtById,
   createThought,
+  updateThought,
+  deleteThought,
 } = require("../../controllers/thoughtController");
 
-// Set up GET all and POST
+// GET all thoughts & create thought
 router
-  .route('/')
+  .route("/")
   .get(getThoughts)
   .post(createThought);
 
-// Set up GET one, PUT, and DELETE at /api/thoughts/:id
+// GET a single thought by its _id, update thought, delete thought
 router
-  .route('/:thoughtId')
+  .route("/:thoughtId")
   .get(getThoughtById)
-  
-
+  .put(updateThought)
+  .delete(deleteThought);
 
 module.exports = router;

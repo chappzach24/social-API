@@ -1,4 +1,4 @@
-const { Thought } = require("../models");
+const { Thought, User } = require("../models");
 
 module.exports = {
   async getThoughts(req, res) {
@@ -35,5 +35,36 @@ module.exports = {
       res.status(500).json({ message: "Server Error" });
     }
   },
+
+  async updateThought(req, res) {
+    const { thoughtId } = req.params;
+    try {
+      const thought = await Thought.findByIdAndUpdate(
+        thoughtId,
+        { $set: req.body },
+        { new: true }
+      );
+      res.json({ message: "Thought updated" });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Server Error" });
+    }
+  },  
+
+  async deleteThought(req, res) {
+    const { thoughtId } = req.params;
+    try {
+      const thought = await Thought.findByIdAndDelete(thoughtId);
+      if (!thought) {
+        return res.status(404).json({ message: "Thought not found" });
+      }
+
+      await User.updateMany({}, { $pull: { thoughts: thoughtId } });
+      res.json({ message: "Thought deleted" });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Server Error" });
+    }
+  }
 
 };
