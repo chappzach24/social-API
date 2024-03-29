@@ -28,6 +28,11 @@ module.exports = {
     const { thoughtText, username } = req.body;
     try {
       const thought = await Thought.create({ thoughtText, username });
+      await User.findOneAndUpdate(
+        { username },
+        { $push: { thoughts: thought._id } },
+        { new: true }
+      );
       res.status(201).json(thought);
     } catch (error) {
       console.error(error);
@@ -37,19 +42,19 @@ module.exports = {
 
   async updateThought(req, res) {
     const { thoughtId } = req.params;
-    const { thoughtText } = req.body; 
-  
+    const { thoughtText } = req.body;
+
     try {
       const thought = await Thought.findByIdAndUpdate(
         thoughtId,
-        { thoughtText }, 
-        { new: true } 
+        { thoughtText },
+        { new: true }
       );
-  
+
       if (!thought) {
         return res.status(404).json({ message: "Thought not found" });
       }
-  
+
       res.json({ message: "Thought updated", thought });
     } catch (error) {
       console.error(error);
@@ -102,7 +107,7 @@ module.exports = {
         return res.status(404).json({ message: "Thought not found" });
       }
 
-      thought.reactions.pull(reactionId);
+      thought.reactions.pull({ _id: reactionId });
       await thought.save();
 
       res.json({ message: "Reaction deleted" });
