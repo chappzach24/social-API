@@ -12,9 +12,8 @@ module.exports = {
   },
 
   async getThoughtById(req, res) {
-    
     try {
-      const thought = await Thought.findById({_id:req.params.thoughtId});
+      const thought = await Thought.findById({ _id: req.params.thoughtId });
       if (!thought) {
         return res.status(404).json({ message: "Thought not found" });
       }
@@ -38,18 +37,25 @@ module.exports = {
 
   async updateThought(req, res) {
     const { thoughtId } = req.params;
+    const { thoughtText } = req.body; 
+  
     try {
       const thought = await Thought.findByIdAndUpdate(
         thoughtId,
-        { $set: req.body },
-        { new: true }
+        { thoughtText }, 
+        { new: true } 
       );
-      res.json({ message: "Thought updated" });
+  
+      if (!thought) {
+        return res.status(404).json({ message: "Thought not found" });
+      }
+  
+      res.json({ message: "Thought updated", thought });
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: "Server Error" });
     }
-  },  
+  },
 
   async deleteThought(req, res) {
     const { thoughtId } = req.params;
@@ -65,6 +71,44 @@ module.exports = {
       console.error(error);
       res.status(500).json({ message: "Server Error" });
     }
-  }
+  },
 
+  async createReaction(req, res) {
+    const { thoughtId } = req.params;
+    const { reactionBody, username } = req.body;
+    try {
+      // Find the thought by ID
+      const thought = await Thought.findById(thoughtId);
+      if (!thought) {
+        return res.status(404).json({ message: "Thought not found" });
+      }
+
+      thought.reactions.push({ reactionBody, username });
+      await thought.save();
+
+      res.status(201).json(thought);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Server Error" });
+    }
+  },
+
+  async deleteReaction(req, res) {
+    const { thoughtId, reactionId } = req.params;
+    try {
+      // Find the thought by ID
+      const thought = await Thought.findById(thoughtId);
+      if (!thought) {
+        return res.status(404).json({ message: "Thought not found" });
+      }
+
+      thought.reactions.pull({ _id: reactionId });
+      await thought.save();
+
+      res.json({ message: "Reaction deleted" });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Server Error" });
+    }
+  },
 };
