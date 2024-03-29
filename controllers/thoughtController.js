@@ -102,7 +102,7 @@ module.exports = {
         return res.status(404).json({ message: "Thought not found" });
       }
 
-      thought.reactions.pull({ _id: reactionId });
+      thought.reactions.pull(reactionId);
       await thought.save();
 
       res.json({ message: "Reaction deleted" });
